@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const CustomerInfo = require("../models/customer");
-const bcrypt = require("bcrypt"); // for password hashing
+const bcrypt = require("bcrypt"); // Needed to hashed password.
 
 // ! Signup a new user or customer
 router.post("/signup", async (req, res) => {
@@ -9,7 +9,9 @@ router.post("/signup", async (req, res) => {
 
   const existingUser = await CustomerInfo.findOne({ email });
   if (existingUser) {
-    return res.status(400).json({ message: "Email is already in use." });
+    return res
+      .status(400)
+      .json({ message: "There's already an account with this email." });
   }
 
   if (password.length < 8) {

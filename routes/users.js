@@ -3,7 +3,7 @@ const router = express.Router();
 const CustomerInfo = require("../models/customer");
 const bcrypt = require("bcrypt"); // Needed to hashed password.
 
-// ! Signup a new user or customer
+// ! Signup a new user or customer.
 router.post("/signup", async (req, res) => {
   const { fName, lName, email, password } = req.body;
 
@@ -44,6 +44,45 @@ router.post("/signup", async (req, res) => {
     console.log(err);
     res.status(400).json({ message: "Failed to register the user." });
   }
+});
+
+// ! Signin a registered customer.
+router.post("/signin", async (req, res) => {
+  const { email, password } = req.body;
+
+  const existingUser = await CustomerInfo.findOne({ email });
+
+  if (!existingUser) {
+    return res.status(400).json({
+      message: "There was a problem. Your email or password is invalid.",
+    });
+  }
+
+  const isPasswordCorrect = await bcrypt.compare(
+    password,
+    existingUser.password
+  );
+
+  if (!isPasswordCorrect) {
+    return res.status(400).json({
+      message: "There was a problem. Your email or password is invalid.",
+    });
+  }
+
+  res.status(201).json({
+    message: "User signed in successfully.",
+    user: {
+      id: existingUser._id,
+      fName: existingUser.fName,
+      lName: existingUser.lName,
+      email: existingUser.email,
+    },
+  });
+});
+
+// ! Signout the current customer.
+router.post("/signout", async (req, res) => {
+  res.status(200).json({ message: "User signed out successfully." });
 });
 
 module.exports = router;
